@@ -1,11 +1,25 @@
 """
-TBD
+class image modifier for Gnapper
 """
 from PIL import Image, ImageDraw
 
 class ImgModifier:
     """
-    Modify image
+    Class for modifying images.
+
+    Attributes
+    ----------
+    outer_img : img
+    inner_img : img
+    padding : int
+
+    Methods
+    -------
+    paste_img()
+        inner_image on top of outer_image
+    add_corners()
+        adds corner to the image
+
     """
     def __init__(self, outer_img, inner_img, padding):
         self.outer_img = outer_img
@@ -14,7 +28,22 @@ class ImgModifier:
 
     def paste_img(self, rounded_corners=False):
         """
-        TBD
+
+        Parameters
+        ----------
+        outer_img : img
+            background image.
+        inner_img : img
+            foreground img.
+        padding : int
+            thickness of border
+        rounded_corners: bool
+            If TRUE, inner image will have curved corners.
+
+        Returns
+        -------
+        img
+             inner_image on top of outer_image
         """
         if rounded_corners and isinstance(rounded_corners, int):
             self.inner_img = self.add_corners(self.inner_img, rounded_corners)
