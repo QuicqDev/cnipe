@@ -1,7 +1,8 @@
 """
-class image modifier for Gnapper
+class image modifier for GNapper
 """
 from PIL import Image, ImageDraw
+
 
 class ImgModifier:
     """
@@ -21,22 +22,17 @@ class ImgModifier:
         adds corner to the image
 
     """
-    def __init__(self, outer_img, inner_img, padding):
+
+    def __init__(self, outer_img, inner_img, padding: int):
         self.outer_img = outer_img
         self.inner_img = inner_img
-        self.padding =  padding
+        self.padding = padding
 
     def paste_img(self, rounded_corners=False):
         """
 
         Parameters
         ----------
-        outer_img : img
-            background image.
-        inner_img : img
-            foreground img.
-        padding : int
-            thickness of border
         rounded_corners: bool
             If TRUE, inner image will have curved corners.
 
@@ -49,11 +45,9 @@ class ImgModifier:
             self.inner_img = self.add_corners(self.inner_img, rounded_corners)
         inner_img_w, inner_img_h = self.inner_img.size
         outer_img = self.outer_img.resize(
-            (inner_img_w + (self.padding*2), inner_img_h + (self.padding*2))
-            )
+            (inner_img_w + (self.padding * 2), inner_img_h + (self.padding * 2)))
         outer_img.paste(self.inner_img, (self.padding, self.padding), self.inner_img)
         return outer_img
-
 
     @staticmethod
     def add_corners(image_old, rad):
@@ -70,8 +64,7 @@ class ImgModifier:
         alpha.paste(circle.crop((rad, 0, rad * 2, rad)), (image_width_old - rad, 0))
         alpha.paste(
             circle.crop((
-                rad, rad, rad * 2, rad * 2)),
-                (image_width_old - rad, image_height_old - rad)
-                )
+                rad, rad, rad * 2, rad * 2)), (image_width_old - rad, image_height_old - rad)
+        )
         image_old.putalpha(alpha)
         return image_old
