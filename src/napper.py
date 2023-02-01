@@ -26,7 +26,6 @@ app.exec_()
 
 # create gradient
 gradient_path = make_gradient_image(store_dir=dir_path, gradient_name=gradient_name)
-print(gradient_path)
 
 image_modify_object = ImgModifier(
     outer_img=Image.open(os.path.join(gradient_path)),
