@@ -9,7 +9,6 @@ import customtkinter
 from napper import sc_taker
 
 from PyQt5 import QtWidgets
-import sys
 from PIL import Image
 
 from screenshot_taker import MyWidget
@@ -37,11 +36,12 @@ def button_function():
     """
     nope
     """
-    app = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication([])
     window = MyWidget(capture_path=os.path.join(dir_path, capture_name))
     window.show()
     app.aboutToQuit.connect(app.deleteLater)
     app.exec_()
+    window.destroy()
 
     # create gradient
     gradient_path = make_gradient_image(store_dir=dir_path, gradient_name=gradient_name)
@@ -62,8 +62,8 @@ def button_function():
 
 # Use CTkButton instead of tkinter Button
 button = customtkinter.CTkButton(master=APP, text="Capture Screenshot", command=button_function)
-button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-print(APP)
+button.place(relx=0.7, rely=0.5, anchor=tkinter.W)
+
 
 if __name__ == "__main__":
     APP.mainloop()
