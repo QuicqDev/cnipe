@@ -1,8 +1,6 @@
 """
-Drop shadows with PIL.
-
-Author: Kevin Schluff
-License: Python license
+(FILE DESCRIPTION)
+@author : Ashutosh | created on : 03-02-2023
 """
 from PIL import Image, ImageFilter
 
@@ -45,7 +43,7 @@ def drop_shadow(image, offset=(5, 5), background=0xffffff, shadow=0x444444, bord
     # Paste the input image onto the shadow backdrop
     imageLeft = border - min(offset[0], 0)
     imageTop = border - min(offset[1], 0)
-    back.paste(image, (imageLeft, imageTop))
+    back.paste(image, (imageLeft, imageTop), image)
 
     return back
 

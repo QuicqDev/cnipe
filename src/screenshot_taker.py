@@ -15,27 +15,6 @@ class MyWidget(QtWidgets.QWidget):
     Widget to capture screenshots
     """
 
-    # def __init__(self, capture_path):
-    #     super().__init__()
-    #     root = tk.Tk()
-    #     # screen_width = root.winfo_screenwidth()
-    #     # screen_height = root.winfo_screenheight()
-    #     print(root.winfo_x(), root.winfo_y())
-    #     current_screen = self.get_monitor_from_coord(root.winfo_x(), root.winfo_y())
-    #     print(current_screen)
-    #     screen_width, screen_height = current_screen.width, current_screen.height
-    #     self.setGeometry(0, 0, screen_width, screen_height)
-    #     self.setWindowTitle(' ')
-    #     self.begin = QtCore.QPoint()
-    #     self.end = QtCore.QPoint()
-    #     self.setWindowOpacity(0.3)
-    #     self.capture_path = capture_path
-    #     QtWidgets.QApplication.setOverrideCursor(
-    #         QtGui.QCursor(QtCore.Qt.CrossCursor)
-    #     )
-    #     self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-    #     self.show()
-
     def __init__(self, capture_path):
         super().__init__()
         root = tk.Tk()
@@ -80,20 +59,6 @@ class MyWidget(QtWidgets.QWidget):
         self.end = self.begin
         self.update()
 
-    # def mousePressEvent(self, event):
-    #     screen_count = QtWidgets.QDesktopWidget().screenCount()
-    #     all_screens = []
-    #     for screen_number in range(screen_count):
-    #         screen = QtWidgets.QDesktopWidget().screenGeometry(screen_number)
-    #         all_screens.append(screen)
-    #     for screen in all_screens:
-    #         if event.x() >= screen.left() and event.x() <= screen.right() and event.y() >= screen.top() and event.y() <= screen.bottom(): # noqa
-    #             self.begin = event.pos()
-    #             self.begin = QtCore.QPoint(event.x() - screen.left(), event.y() - screen.top())
-    #             self.end = self.begin
-    #             break
-    #     self.update()
-
     def mouseMoveEvent(self, event):
         self.end = event.pos()
         self.update()
@@ -108,38 +73,3 @@ class MyWidget(QtWidgets.QWidget):
         print((x1, y1, x2, y2))
         img = ImageGrab.grab(bbox=(x1, y1, x2, y2), all_screens=True)
         img.save(self.capture_path)
-        # img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
-        #
-        # cv2.imshow('Captured Image', img)
-        # cv2.waitKey(0)
-    #     # cv2.destroyAllWindows()
-
-    # def mouseReleaseEvent(self, event):
-    #     self.close()
-    #     print(self.begin, self.end)
-    #     x1 = min(self.begin.x(), self.end.x())
-    #     y1 = min(self.begin.y(), self.end.y())
-    #     x2 = max(self.begin.x(), self.end.x())
-    #     y2 = max(self.begin.y(), self.end.y())
-    #     print(x1, y1, x2, y2)
-    #     screen_count = QtWidgets.QDesktopWidget().screenCount()
-    #     all_screens = []
-    #     for screen_number in range(screen_count):
-    #         screen = QtWidgets.QDesktopWidget().screenGeometry(screen_number)
-    #         all_screens.append(screen)
-    #     print(all_screens)
-    #     for screen in all_screens:
-    #         if x1 >= screen.left() and x2 <= screen.right() and y1 >= screen.top() and y2 <= screen.bottom():
-    #             print("here")
-    #             img = ImageGrab.grab(bbox=(
-    #                 x1 - screen.left(), y1 - screen.top(), x2 - screen.left(), y2 - screen.top()))
-    #             break
-    #     img.save(self.capture_path)
-
-
-# if __name__ == '__main__':
-#     app = QtWidgets.QApplication(sys.argv)
-#     window = MyWidget()
-#     window.show()
-#     app.aboutToQuit.connect(app.deleteLater)
-#     sys.exit(app.exec_())
