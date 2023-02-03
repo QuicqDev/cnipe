@@ -2,6 +2,7 @@
 class image modifier for GNapper
 """
 from PIL import Image, ImageDraw
+from shadow import drop_shadow
 
 
 class ImgModifier:
@@ -28,13 +29,14 @@ class ImgModifier:
         self.inner_img = inner_img
         self.padding = padding
 
-    def paste_img(self, rounded_corners=False):
+    def paste_img(self, rounded_corners=False, shadow=False):
         """
 
         Parameters
         ----------
         rounded_corners: bool
             If TRUE, inner image will have curved corners.
+        shadow:
 
         Returns
         -------
@@ -43,6 +45,11 @@ class ImgModifier:
         """
         if rounded_corners and isinstance(rounded_corners, int):
             self.inner_img = self.add_corners(self.inner_img, rounded_corners)
+
+        if shadow:
+            self.inner_img = drop_shadow(
+                self.inner_img, shadow="#000000", offset=(-10, 8), iterations=50)
+
         inner_img_w, inner_img_h = self.inner_img.size
         outer_img = self.outer_img.resize(
             (inner_img_w + (self.padding * 2), inner_img_h + (self.padding * 2)))
