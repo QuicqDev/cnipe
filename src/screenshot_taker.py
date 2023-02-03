@@ -2,11 +2,8 @@
 (FILE DESCRIPTION)
 @author : Ashutosh | created on : 29-01-2023
 """
-import sys
-
 import screeninfo
 from PyQt5 import QtWidgets, QtCore, QtGui
-import tkinter as tk
 from PIL import ImageGrab
 
 
@@ -17,7 +14,6 @@ class MyWidget(QtWidgets.QWidget):
 
     def __init__(self, capture_path):
         super().__init__()
-        root = tk.Tk()
         screen_count = QtWidgets.QDesktopWidget().screenCount()
         print(screen_count)
         all_screens = []
