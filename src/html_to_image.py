@@ -3,7 +3,6 @@ HTML 2 Image
 @author : Ashutosh | created on : 23-12-2022
 """
 import os
-
 from html2image import Html2Image
 
 
