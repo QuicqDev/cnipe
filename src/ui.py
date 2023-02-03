@@ -60,7 +60,7 @@ def button_function():
     bg_image_label.grid(row=0, column=0)
 
 
-# Use CTkButton instead of tkinter Button
+# Use CTkButton
 button = customtkinter.CTkButton(master=APP, text="Capture Screenshot", command=button_function)
 button.place(relx=0.7, rely=0.5, anchor=tkinter.W)
 
