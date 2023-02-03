@@ -1,82 +1,60 @@
-import os
-import sys
-from PyQt5 import QtWidgets, QtGui, QtCore
+"""
+Drop shadows with PIL.
 
-class Screenshot(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
+Author: Kevin Schluff
+License: Python license
+"""
+from PIL import Image, ImageFilter
 
-        # Create a label and set its background color to white
-        self.label = QtWidgets.QLabel(self)
-        self.label.setStyleSheet("background-color: white")
 
-        # Create a push button and set its text
-        self.button = QtWidgets.QPushButton('Take Screenshot', self)
+def drop_shadow(image, offset=(5, 5), background=0xffffff, shadow=0x444444, border=8, iterations=3):
+    """
+    Add a gaussian blur drop shadow to an image.
 
-        # Create a vertical layout and add the label and button
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.addWidget(self.label)
-        layout.addWidget(self.button)
+    image       - The image to overlay on top of the shadow.
+    offset      - Offset of the shadow from the image as an (x,y) tuple.  Can be
+                  positive or negative.
+    background  - Background colour behind the image.
+    shadow      - Shadow colour (darkness).
+    border      - Width of the border around the image.  This must be wide
+                  enough to account for the blurring of the shadow.
+    iterations  - Number of times to apply the filter.  More iterations
+                  produce a more blurred shadow, but increase processing time.
+    """
 
-        # Connect the button's clicked signal to the start_rectangle_screenshot method
-        self.button.clicked.connect(self.start_rectangle_screenshot)
+    # Create the backdrop image -- a box in the background colour with a
+    # shadow on it.
+    totalWidth = image.size[0] + abs(offset[0]) + 2 * border
+    totalHeight = image.size[1] + abs(offset[1]) + 2 * border
+    # back = Image.new(image.mode, (totalWidth, totalHeight), background)
+    back = Image.new("RGBA", (totalWidth, totalHeight), background)
 
-    def start_rectangle_screenshot(self):
-        # Hide the button and show the cursor
-        self.button.hide()
-        QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+    # Place the shadow, taking into account the offset from the image
+    shadowLeft = border + max(offset[0], 0)
+    shadowTop = border + max(offset[1], 0)
+    back.paste(shadow, [shadowLeft, shadowTop, shadowLeft + image.size[0],
+                        shadowTop + image.size[1]])
 
-        # Create a blank pixmap and a painter to draw on it
-        self.pixmap = QtGui.QPixmap()
-        self.painter = QtGui.QPainter(self.pixmap)
-        self.painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+    # Apply the filter to blur the edges of the shadow.  Since a small kernel
+    # is used, the filter must be applied repeatedly to get a decent blur.
+    n = 0
+    while n < iterations:
+        back = back.filter(ImageFilter.BLUR)
+        n += 1
 
-        # Set the painter's pen to a red dashed line
-        self.painter.setPen(QtGui.QPen(QtGui.QColor(255, 0, 0), 2, QtCore.Qt.DashLine))
+    # Paste the input image onto the shadow backdrop
+    imageLeft = border - min(offset[0], 0)
+    imageTop = border - min(offset[1], 0)
+    back.paste(image, (imageLeft, imageTop))
 
-        # Connect the mouse press, move, and release events to the corresponding methods
-        self.label.mousePressEvent = self.on_mouse_press
-        self.label.mouseMoveEvent = self.on_mouse_move
-        self.label.mouseReleaseEvent = self.on_mouse_release
+    return back
 
-    def on_mouse_press(self, event):
-        # Start drawing the rectangle from the mouse press position
-        self.start_point = event.pos()
-        self.end_point = self.start_point
 
-    def on_mouse_move(self, event):
-        # Update the end point of the rectangle and redraw it
-        self.end_point = event.pos()
-        self.update_screenshot()
-
-    def on_mouse_release(self, event):
-        # Update the end point of the rectangle and redraw it
-        self.end_point = event.pos()
-        self.update_screenshot()
-
-        # Save the screenshot to a file
-        self.pixmap.save("screenshot.png")
-
-        # Show the button and reset the cursor
-        self.button.show()
-        QtWidgets.QApplication.restoreOverrideCursor()
-
-    def update_screenshot(self):
-        # Clear the pixmap and draw the desktop screenshot on it
-        self.pixmap.fill(QtCore.Qt.transparent)
-        self.painter.drawPixmap(QtCore.QRect(0, 0, QtWidgets.QApplication.primaryScreen().size().width(), QtWidgets.QApplication.primaryScreen().size().height()), QtWidgets.QApplication.primaryScreen().grabWindow(0))
-
-        # Draw the rectangle on the pixmap
-        self.painter.drawRect(QtCore.QRect(self.start_point, self.end_point))
-
-        # Set the label's pixmap to the updated screenshot
-        self.label.setPixmap(self.pixmap)
-
-    
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    window = Screenshot()
-    window.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     import sys
+#
+#     image = Image.open("../temp/capture.png")
+#     # image.thumbnail((200, 200), Image.ANTIALIAS)
+#
+#     # drop_shadow(image, border=50).show()
+#     drop_shadow(image, background="#305fb9", shadow="#ffcb6b", offset=(-10, 8), iterations=50).show()
