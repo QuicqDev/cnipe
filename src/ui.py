@@ -29,15 +29,18 @@ gradient_name = "gradient.png"
 customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
 
 APP = customtkinter.CTk()  # create CTk window like you do with the Tk window
-APP.geometry("600x600")
-APP.wm_iconbitmap("../ui/icon.ico")
-APP.title("GNapper - Take Beautiful Screenshots")
+APP.geometry("800x500")
+APP.wm_iconbitmap("../ui/gnapper.ico")
+APP.iconbitmap(default='../ui/gnapper.ico')
+APP.title("Cnipe - Take Beautiful Screenshots")
 
 
 def button_function():
     """
     nope
     """
+    # minimise the app after taking screenshot
+    APP.wm_state('iconic')
     app = QtWidgets.QApplication([])
     window = MyWidget(capture_path=os.path.join(dir_path, capture_name))
     window.show()
@@ -60,6 +63,10 @@ def button_function():
     bg_image = customtkinter.CTkImage(Image.open(os.path.join(dir_path, "modified.png")), size=(300, 400))
     bg_image_label = customtkinter.CTkLabel(master=APP, image=bg_image)
     bg_image_label.grid(row=0, column=0)
+
+    # open the app after taking screenshot
+    # APP.wm_state("zoomed")
+    APP.deiconify()
 
 
 # Use CTkButton
