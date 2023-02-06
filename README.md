@@ -1,4 +1,4 @@
 ![](ui/gnapper.png)       
-# GNapper
+# Cnipe
 
 Take Beautiful Screenshots
