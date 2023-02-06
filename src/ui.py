@@ -30,6 +30,8 @@ customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-b
 
 APP = customtkinter.CTk()  # create CTk window like you do with the Tk window
 APP.geometry("600x600")
+APP.wm_iconbitmap("../ui/icon.ico")
+APP.title("GNapper - Take Beautiful Screenshots")
 
 
 def button_function():
