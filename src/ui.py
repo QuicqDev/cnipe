@@ -32,7 +32,8 @@ class App(customtkinter.CTk):
         self.home_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(UI_PATH, "home_dark.png")),
                                                  dark_image=Image.open(os.path.join(UI_PATH, "home_light.png")),
                                                  size=(20, 20))
-        # self.home_frame_large_image_label = None
+        self.use_same_colors = None
+        self.colors = [(247, 253, 166, 1), (128, 255, 221, 1), (255, 128, 249, 1)]  # initialise with set of colors
 
         self.logo_image = customtkinter.CTkImage(
             Image.open(os.path.join(UI_PATH, "gnapper.png")), size=(30, 30))
@@ -71,25 +72,34 @@ class App(customtkinter.CTk):
 
         self.home_button_event()
 
-    def capture_screenshot(self):
+    def capture_screenshot(self, use_old=False):
         """
         capture screenshot
         """
         capture_name = "capture.png"
         gradient_name = "gradient.png"
 
-        # minimise the app after taking screenshot
-        self.wm_state('iconic')
-        self.clear_frame(name="home")
-        qt_app = QtWidgets.QApplication([])
-        window = MyWidget(capture_path=os.path.join(IMAGE_DIR_PATH, capture_name))
-        window.show()
-        qt_app.aboutToQuit.connect(qt_app.deleteLater)
-        qt_app.exec_()
-        window.destroy()
+        if not use_old:
+            # minimise the app after clicking screenshot button
+            self.wm_state('iconic')
+            self.clear_frame(name="home")
+            qt_app = QtWidgets.QApplication([])
+            window = MyWidget(capture_path=os.path.join(IMAGE_DIR_PATH, capture_name))
+            window.show()
+            qt_app.aboutToQuit.connect(qt_app.deleteLater)
+            qt_app.exec_()
+            window.destroy()
+
+        color_grad = None
+        if self.use_same_colors is not None and self.use_same_colors.get() == 1:
+            color_grad = self.colors
 
         # create gradient
-        gradient_path = make_gradient_image(store_dir=IMAGE_DIR_PATH, gradient_name=gradient_name)
+        gradient_path, self.colors = make_gradient_image(
+            store_dir=IMAGE_DIR_PATH,
+            gradient_name=gradient_name,
+            colors=color_grad
+        )
 
         image_modify_object = ImgModifier(
             outer_img=Image.open(os.path.join(gradient_path)),
@@ -104,76 +114,56 @@ class App(customtkinter.CTk):
         pad_x, pad_y = 20, 10
         print(">> ", im_width, im_height, self.home_frame.current_width, self.home_frame._current_height) # noqa
         x, y = self.home_frame.current_width, self.home_frame._current_height # noqa
-        x -= (2 * pad_x)
-        y -= (2 * pad_y)
+        x -= (8 * pad_x)
+        y -= (10 * pad_y)
         # if x > 0 and y > 0:
         #     print("here")
         bg_image = ImageOps.contain(modified_image, (int(x), int(y)))
 
         # show image in home frame
-        # bg_image = customtkinter.CTkImage(Image.open(os.path.join(IMAGE_DIR_PATH, "modified.png")), size=(500, 150))
         bg_image = customtkinter.CTkImage(bg_image, size=(bg_image.size[0], bg_image.size[1]))
-        # bg_image_label.grid(row=0, column=1)
 
         home_frame_large_image_label = customtkinter.CTkLabel(self.home_frame, text="", image=bg_image)
         home_frame_large_image_label.grid(row=0, column=0, padx=pad_x, pady=pad_y)
 
-        # self.home_frame_large_image_label.bind('<Configure>', self.resize_image)
-        # self.home_frame_large_image_label.pack(expand=tkinter.YES)
+        regen_grad = customtkinter.CTkButton(
+            self.home_frame,
+            text="Refresh Gradient", command=self.generate_gradient, border_spacing=10)
+        regen_grad.grid(row=2, column=0)
 
-        # open the app after taking screenshot
-        # APP.wm_state("zoomed")
+        print(self.use_same_colors)
+        if self.use_same_colors is None:
+            self.use_same_colors = customtkinter.CTkCheckBox(
+                self.home_frame, text="Keep Same Colors"
+            )
+            self.use_same_colors.grid(row=3, column=0, padx=10, pady=10)
+        else:
+            current_val = self.use_same_colors.get()
+            self.use_same_colors = customtkinter.CTkCheckBox(
+                self.home_frame, text="Keep Same Colors"
+            )
+            self.use_same_colors.grid(row=3, column=0, padx=10, pady=10)
+            if current_val == 1:
+                self.use_same_colors.select()
+
         self.deiconify()
 
     def select_frame_by_name(self, name):
         """
-        Select frame on main window
+        Select frame on main window by name
         """
         # set button color for selected button
         self.home_button.configure(fg_color=("gray75", "gray25") if name == "home" else "transparent")
-        # self.frame_2_button.configure(fg_color=("gray75", "gray25") if name == "frame_2" else "transparent")
-        # self.frame_3_button.configure(fg_color=("gray75", "gray25") if name == "frame_3" else "transparent")
 
         # show selected frame
         if name == "home":
             self.home_frame.grid(row=0, column=1, sticky="nsew")
         else:
             self.home_frame.grid_forget()
-        # if name == "frame_2":
-        #     self.second_frame.grid(row=0, column=1, sticky="nsew")
-        # else:
-        #     self.second_frame.grid_forget()
-        # if name == "frame_3":
-        #     self.third_frame.grid(row=0, column=1, sticky="nsew")
-        # else:
-        #     self.third_frame.grid_forget()
 
     def home_button_event(self):
         """Select home frame"""
         self.select_frame_by_name("home")
-
-    # def resize_image(self, event):
-    #     """auto resize image"""
-    #     new_width = event.width
-    #     new_height = event.height
-    #     print(f"resizing : {new_width, new_height}")
-    #     image = self.sc_image.resize((new_width, new_height))
-    #     photo = ImageTk.PhotoImage(image)
-    #     self.home_frame_large_image_label.configure(image=photo)
-    #     self.home_frame_large_image_label.image = photo  # avoid garbage collection
-
-    # @staticmethod
-    # def resize_image(self, image_width, image_height, frame_width, frame_height, pad_x=0, pad_y=0):
-    #     """
-    #     Resize image
-    #     """
-    #     net_width = frame_width - (2 * pad_x)
-    #     net_height = frame_height - (2 * pad_y)
-    #
-    #     aspect_ratio = image_width / image_height
-    #     net_height = net_height * aspect_ratio
-    #
-    #     return net_width, net_height
 
     def clear_frame(self, name):
         """
@@ -187,6 +177,10 @@ class App(customtkinter.CTk):
         # this will clear frame and frame will be empty
         # if you want to hide the empty panel then
         # frame.pack_forget()
+
+    def generate_gradient(self):
+        """Generate random gradient"""
+        self.capture_screenshot(use_old=True)
 
 
 if __name__ == "__main__":
