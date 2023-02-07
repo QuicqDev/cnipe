@@ -15,12 +15,12 @@ class MyWidget(QtWidgets.QWidget):
     def __init__(self, capture_path):
         super().__init__()
         screen_count = QtWidgets.QDesktopWidget().screenCount()
-        print(screen_count)
+        # print(screen_count)
         all_screens = []
         for screen_number in range(screen_count):
             screen = QtWidgets.QDesktopWidget().screenGeometry(screen_number)
             all_screens.append(screen)
-        print(all_screens)
+        # print(all_screens)
         total_width = sum(screen.width() for screen in all_screens)
         max_height = max(screen.height() for screen in all_screens)
         self.setGeometry(0, 0, total_width, max_height)
@@ -61,11 +61,11 @@ class MyWidget(QtWidgets.QWidget):
 
     def mouseReleaseEvent(self, event):
         self.close()
-        print(self.begin, self.end)
+        # print(self.begin, self.end)
         x1 = min(self.begin.x(), self.end.x())
         y1 = min(self.begin.y(), self.end.y())
         x2 = max(self.begin.x(), self.end.x())
         y2 = max(self.begin.y(), self.end.y())
-        print((x1, y1, x2, y2))
+        # print((x1, y1, x2, y2))
         img = ImageGrab.grab(bbox=(x1, y1, x2, y2), all_screens=True)
         img.save(self.capture_path)
