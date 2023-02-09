@@ -3,6 +3,8 @@
 @author : Ashutosh | created on : 01-02-2023
 """
 import os
+from tkinter import filedialog
+
 import customtkinter
 
 from PyQt5 import QtWidgets
@@ -45,6 +47,8 @@ class App(customtkinter.CTk):
         self.logo_image = customtkinter.CTkImage(
             Image.open(os.path.join(UI_PATH, "gnapper.png")), size=(30, 30))
         self.main_image = None
+        self.modified_image = None
+        self.padding = 25
 
         # set grid layout 1x2
         self.grid_rowconfigure(0, weight=1)
@@ -115,28 +119,32 @@ class App(customtkinter.CTk):
             padding=padding
         )
 
-        modified_image = image_modify_object.paste_img(rounded_corners=16)
-        modified_image.save(os.path.join(IMAGE_DIR_PATH, "modified.png"))
+        self.modified_image = image_modify_object.paste_img(rounded_corners=16)
+        self.modified_image.save(os.path.join(IMAGE_DIR_PATH, "modified.png"))
 
         # im_width, im_height = modified_image.size
-        pad_x, pad_y = 20, 10
+        pad_x, pad_y = 60, 40
         # print(">> ", im_width, im_height, self.home_frame.current_width, self.home_frame._current_height) # noqa
         x, y = self.home_frame.current_width, self.home_frame._current_height # noqa
         x -= (8 * pad_x)
         y -= (10 * pad_y)
         # if x > 0 and y > 0:
         #     print("here")
-        bg_image = ImageOps.contain(modified_image, (int(x), int(y)))
+        bg_image = ImageOps.contain(self.modified_image, (int(x), int(y)))
 
         # show image in home frame
         bg_image = customtkinter.CTkImage(bg_image, size=(bg_image.size[0], bg_image.size[1]))
 
         if self.main_image is not None:
-            self.main_image.destroy()
+            try:
+                self.main_image.destroy()
+            except ValueError:
+                pass
 
         self.main_image = customtkinter.CTkLabel(self.home_frame, text="", image=bg_image)
         self.main_image.grid(row=0, column=0, padx=pad_x, pady=pad_y)
 
+        # refresh gradient, generate random gradient
         regen_grad = customtkinter.CTkButton(
             self.home_frame,
             text="Refresh Gradient", command=self.generate_gradient, border_spacing=10)
@@ -162,11 +170,17 @@ class App(customtkinter.CTk):
             sl_frame, from_=5, to=100, command=self.slider_event,
             number_of_steps=15
         )
-        slider.set(padding)
+        self.padding = padding
+        slider.set(self.padding)
         slider_label = customtkinter.CTkLabel(sl_frame, text=f"Padding : {padding}x")
         slider_label.grid(row=0, column=0)
         slider.grid(row=0, column=1)
         sl_frame.grid(row=4, column=0)
+
+        # save modified image
+        save_button = customtkinter.CTkButton(
+            self.home_frame, text="Save Image", command=self.save_image, border_spacing=10)
+        save_button.grid(row=5, column=0)
 
         self.deiconify()
 
@@ -202,13 +216,21 @@ class App(customtkinter.CTk):
 
     def generate_gradient(self):
         """Generate random gradient"""
-        self.capture_screenshot(use_old=True)
+        self.capture_screenshot(use_old=True, padding=self.padding)
 
     def slider_event(self, slide):
         """
         Slider padding
         """
         self.capture_screenshot(use_old=True, padding=int(slide))
+
+    def save_image(self):
+        """save image to selected file"""
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".png", filetypes=[("PNG", "*.png")]
+        )
+        if file_path:
+            self.modified_image.save(file_path)
 
 
 if __name__ == "__main__":
