@@ -3,6 +3,7 @@
 @author : Ashutosh | created on : 01-02-2023
 """
 import os
+import time
 from tkinter import filedialog
 
 import customtkinter
@@ -10,14 +11,23 @@ import customtkinter
 from PyQt5 import QtWidgets
 from PIL import Image, ImageOps
 
-from screenshot_taker import MyWidget
-from html_to_image import make_gradient_image
-from image_shaper import ImgModifier
+from src.screenshot_taker import MyWidget
+from src.html_to_image import make_gradient_image
+from src.image_shaper import ImgModifier
+
+root = os.getcwd()
+print(root)
+for path, sub_dirs, files in os.walk(root):
+    for name in files:
+        print(name, path, sub_dirs)
+        print(os.path.join(path, name))
+        print("--")
+time.sleep(5)
 
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
-UI_PATH = "../ui"
-IMAGE_DIR_PATH = os.path.join("..", "temp")
+UI_PATH = "ui"
+IMAGE_DIR_PATH = os.path.join("temp")
 
 
 class App(customtkinter.CTk):
@@ -35,8 +45,8 @@ class App(customtkinter.CTk):
         else:
             self.geometry("900x700")
 
-        self.wm_iconbitmap("../ui/gnapper.ico")
-        self.iconbitmap(default='../ui/gnapper.ico')
+        self.wm_iconbitmap(os.path.join("ui", "gnapper.ico"))
+        self.iconbitmap(default=r'ui\\gnapper.ico')
         self.title("Cnipe - Take Beautiful Screenshot")
         self.home_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(UI_PATH, "home_dark.png")),
                                                  dark_image=Image.open(os.path.join(UI_PATH, "home_light.png")),

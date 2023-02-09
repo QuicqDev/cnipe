@@ -3,7 +3,7 @@ class image modifier for GNapper
 """
 import PIL
 from PIL import Image, ImageDraw
-from shadow import drop_shadow
+from src.shadow import drop_shadow
 
 OPTION_TYPE = [int, bool]
 

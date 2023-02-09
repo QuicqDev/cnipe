@@ -51,7 +51,7 @@ def drop_shadow(image, offset=(5, 5), background=0xffffff, shadow=0x444444, bord
 # if __name__ == "__main__":
 #     import sys
 #
-#     image = Image.open("../temp/capture.png")
+#     image = Image.open("temp/capture.png")
 #     # image.thumbnail((200, 200), Image.ANTIALIAS)
 #
 #     # drop_shadow(image, border=50).show()

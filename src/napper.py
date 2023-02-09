@@ -13,7 +13,7 @@ from html_to_image import make_gradient_image
 from image_shaper import ImgModifier
 
 
-dir_path = os.path.join("..", "temp")
+dir_path = os.path.join("temp")
 capture_name = "capture.png"
 gradient_name = "gradient.png"
 
