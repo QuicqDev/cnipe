@@ -3,19 +3,31 @@
 @author : Ashutosh | created on : 01-02-2023
 """
 import os
+import time
+from tkinter import filedialog
+
 import customtkinter
 
 from PyQt5 import QtWidgets
 from PIL import Image, ImageOps
 
-from screenshot_taker import MyWidget
-from html_to_image import make_gradient_image
-from image_shaper import ImgModifier
+from src.screenshot_taker import MyWidget
+from src.html_to_image import make_gradient_image
+from src.image_shaper import ImgModifier
+
+root = os.getcwd()
+print(root)
+for path, sub_dirs, files in os.walk(root):
+    for name in files:
+        print(name, path, sub_dirs)
+        print(os.path.join(path, name))
+        print("--")
+time.sleep(5)
 
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
-UI_PATH = "../ui"
-IMAGE_DIR_PATH = os.path.join("..", "temp")
+UI_PATH = "ui"
+IMAGE_DIR_PATH = os.path.join("temp")
 
 
 class App(customtkinter.CTk):
@@ -25,9 +37,16 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-        self.geometry("900x700")
-        self.wm_iconbitmap("../ui/gnapper.ico")
-        self.iconbitmap(default='../ui/gnapper.ico')
+        # set full screen for better view
+        if os.name == "nt":
+            self.state('zoomed')
+        elif os.name == "posix":
+            self.attributes('-fullscreen', True)
+        else:
+            self.geometry("900x700")
+
+        self.wm_iconbitmap(os.path.join("ui", "gnapper.ico"))
+        self.iconbitmap(default=r'ui\\gnapper.ico')
         self.title("Cnipe - Take Beautiful Screenshot")
         self.home_image = customtkinter.CTkImage(light_image=Image.open(os.path.join(UI_PATH, "home_dark.png")),
                                                  dark_image=Image.open(os.path.join(UI_PATH, "home_light.png")),
@@ -37,6 +56,9 @@ class App(customtkinter.CTk):
 
         self.logo_image = customtkinter.CTkImage(
             Image.open(os.path.join(UI_PATH, "gnapper.png")), size=(30, 30))
+        self.main_image = None
+        self.modified_image = None
+        self.padding = 25
 
         # set grid layout 1x2
         self.grid_rowconfigure(0, weight=1)
@@ -72,7 +94,7 @@ class App(customtkinter.CTk):
 
         self.home_button_event()
 
-    def capture_screenshot(self, use_old=False):
+    def capture_screenshot(self, use_old=False, padding=25):
         """
         capture screenshot
         """
@@ -104,34 +126,40 @@ class App(customtkinter.CTk):
         image_modify_object = ImgModifier(
             outer_img=Image.open(os.path.join(gradient_path)),
             inner_img=Image.open(os.path.join(IMAGE_DIR_PATH, capture_name)),
-            padding=25
+            padding=padding
         )
 
-        modified_image = image_modify_object.paste_img(rounded_corners=16)
-        modified_image.save(os.path.join(IMAGE_DIR_PATH, "modified.png"))
+        self.modified_image = image_modify_object.paste_img(rounded_corners=16)
+        self.modified_image.save(os.path.join(IMAGE_DIR_PATH, "modified.png"))
 
-        im_width, im_height = modified_image.size
-        pad_x, pad_y = 20, 10
-        print(">> ", im_width, im_height, self.home_frame.current_width, self.home_frame._current_height) # noqa
+        # im_width, im_height = modified_image.size
+        pad_x, pad_y = 60, 40
+        # print(">> ", im_width, im_height, self.home_frame.current_width, self.home_frame._current_height) # noqa
         x, y = self.home_frame.current_width, self.home_frame._current_height # noqa
         x -= (8 * pad_x)
         y -= (10 * pad_y)
         # if x > 0 and y > 0:
         #     print("here")
-        bg_image = ImageOps.contain(modified_image, (int(x), int(y)))
+        bg_image = ImageOps.contain(self.modified_image, (int(x), int(y)))
 
         # show image in home frame
         bg_image = customtkinter.CTkImage(bg_image, size=(bg_image.size[0], bg_image.size[1]))
 
-        home_frame_large_image_label = customtkinter.CTkLabel(self.home_frame, text="", image=bg_image)
-        home_frame_large_image_label.grid(row=0, column=0, padx=pad_x, pady=pad_y)
+        if self.main_image is not None:
+            try:
+                self.main_image.destroy()
+            except ValueError:
+                pass
 
+        self.main_image = customtkinter.CTkLabel(self.home_frame, text="", image=bg_image)
+        self.main_image.grid(row=0, column=0, padx=pad_x, pady=pad_y)
+
+        # refresh gradient, generate random gradient
         regen_grad = customtkinter.CTkButton(
             self.home_frame,
             text="Refresh Gradient", command=self.generate_gradient, border_spacing=10)
         regen_grad.grid(row=2, column=0)
 
-        print(self.use_same_colors)
         if self.use_same_colors is None:
             self.use_same_colors = customtkinter.CTkCheckBox(
                 self.home_frame, text="Keep Same Colors"
@@ -145,6 +173,24 @@ class App(customtkinter.CTk):
             self.use_same_colors.grid(row=3, column=0, padx=10, pady=10)
             if current_val == 1:
                 self.use_same_colors.select()
+
+        # slider frame
+        sl_frame = customtkinter.CTkFrame(self.home_frame)
+        slider = customtkinter.CTkSlider(
+            sl_frame, from_=5, to=100, command=self.slider_event,
+            number_of_steps=15
+        )
+        self.padding = padding
+        slider.set(self.padding)
+        slider_label = customtkinter.CTkLabel(sl_frame, text=f"Padding : {padding}x")
+        slider_label.grid(row=0, column=0)
+        slider.grid(row=0, column=1)
+        sl_frame.grid(row=4, column=0)
+
+        # save modified image
+        save_button = customtkinter.CTkButton(
+            self.home_frame, text="Save Image", command=self.save_image, border_spacing=10)
+        save_button.grid(row=5, column=0)
 
         self.deiconify()
 
@@ -180,7 +226,21 @@ class App(customtkinter.CTk):
 
     def generate_gradient(self):
         """Generate random gradient"""
-        self.capture_screenshot(use_old=True)
+        self.capture_screenshot(use_old=True, padding=self.padding)
+
+    def slider_event(self, slide):
+        """
+        Slider padding
+        """
+        self.capture_screenshot(use_old=True, padding=int(slide))
+
+    def save_image(self):
+        """save image to selected file"""
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".png", filetypes=[("PNG", "*.png")]
+        )
+        if file_path:
+            self.modified_image.save(file_path)
 
 
 if __name__ == "__main__":
