@@ -1,12 +1,13 @@
 # Changelog
 
-## v0.1.1
+## v0.2.0
 
-1. Take screenshots
-2. Add gradient to screenshots
-3. Change gradients, shuffle them
-4. Use a single gradient and shuffle the color placement i.e. degrees
-5. Take screenshots multiple times
+1. Bug fix with CTk v5.1.2 : full screen on start
+2. Save images on temporary directory, instead of custom temp
+3. Permission dismissal on regular run
+4. Remove sleep of 5 seconds
+5. Add message box on cancel of cnipe app
+
 
 ## v0.1.2
 
@@ -16,3 +17,12 @@
 4. Save image to desired directory
 5. Bug: Fix images by destroying older ones, this frees up memory consumption
 6. Bug: Fix button slides when image is too large
+
+
+## v0.1.1
+
+1. Take screenshots
+2. Add gradient to screenshots
+3. Change gradients, shuffle them
+4. Use a single gradient and shuffle the color placement i.e. degrees
+5. Take screenshots multiple times
