@@ -8,9 +8,8 @@ Application to generate beautiful screenshots
 
 1. Working directory : ``~\cnipe\src``
 2. ``
-python ui.py
-``
-
+   python ui.py
+   ``
 
 ## Build
 

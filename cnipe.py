@@ -1,10 +1,10 @@
 """
-(FILE DESCRIPTION)
+Take beautiful screenshots from CNIPE
 @author : Ashutosh | created on : 01-02-2023
 """
 import os
-import time
-from tkinter import filedialog
+import tempfile
+from tkinter import filedialog, messagebox
 
 import customtkinter
 
@@ -15,19 +15,12 @@ from src.screenshot_taker import MyWidget
 from src.html_to_image import make_gradient_image
 from src.image_shaper import ImgModifier
 
-root = os.getcwd()
-print(root)
-for path, sub_dirs, files in os.walk(root):
-    for name in files:
-        print(name, path, sub_dirs)
-        print(os.path.join(path, name))
-        print("--")
-time.sleep(5)
-
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
-customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-blue, green
+customtkinter.set_default_color_theme("green")  # Theme
 UI_PATH = "ui"
-IMAGE_DIR_PATH = os.path.join("temp")
+tempdir = tempfile.TemporaryDirectory()
+# save gradient and captured images in temp file which gets deleted after the execution is done
+IMAGE_DIR_PATH = tempdir.name
 
 
 class App(customtkinter.CTk):
@@ -37,13 +30,11 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-        # set full screen for better view
+        # set full screen for better view, full screen is different in different OS
         if os.name == "nt":
             self.state('zoomed')
         elif os.name == "posix":
             self.attributes('-fullscreen', True)
-        else:
-            self.geometry("900x700")
 
         self.wm_iconbitmap(os.path.join("ui", "gnapper.ico"))
         self.iconbitmap(default=r'ui\\gnapper.ico')
@@ -132,14 +123,11 @@ class App(customtkinter.CTk):
         self.modified_image = image_modify_object.paste_img(rounded_corners=16)
         self.modified_image.save(os.path.join(IMAGE_DIR_PATH, "modified.png"))
 
-        # im_width, im_height = modified_image.size
         pad_x, pad_y = 60, 40
-        # print(">> ", im_width, im_height, self.home_frame.current_width, self.home_frame._current_height) # noqa
-        x, y = self.home_frame.current_width, self.home_frame._current_height # noqa
+        x, y = self.home_frame._current_width, self.home_frame._current_height # noqa
         x -= (8 * pad_x)
         y -= (10 * pad_y)
-        # if x > 0 and y > 0:
-        #     print("here")
+
         bg_image = ImageOps.contain(self.modified_image, (int(x), int(y)))
 
         # show image in home frame
@@ -242,7 +230,15 @@ class App(customtkinter.CTk):
         if file_path:
             self.modified_image.save(file_path)
 
+    def on_closing(self):
+        """On close"""
+        if messagebox.askokcancel("Quit", "Do you want to quit, have you saved the image?"):
+            tempdir.cleanup()
+            self.destroy()
+
 
 if __name__ == "__main__":
     app = App()
+    app.after(0, lambda: app.state('zoomed'))
+    app.protocol("WM_DELETE_WINDOW", app.on_closing)
     app.mainloop()
