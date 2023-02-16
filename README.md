@@ -4,6 +4,12 @@
 
 Application to generate beautiful screenshots
 
+### Features:
+
+1. Take Screenshots
+2. Add beautiful gradients to the background
+3. Save the image and share it to others
+
 ### Usage
 
 1. Working directory : ``~\cnipe\src``
@@ -16,3 +22,12 @@ Application to generate beautiful screenshots
 ```
 pyinstaller --noconfirm --onedir --windowed --icon "E:/Others/GNapper/ui/gnapper.ico" --name "Cnipe" --add-data "E:/Others/GNapper/src;src/" --add-data "E:/Others/GNapper/ui;ui/" --add-data "E:/Others/GNapper/venv/Lib/site-packages/customtkinter;customtkinter/"  "E:/Others/GNapper/cnipe.py"
 ```
+
+
+# Sample Images
+
+<p align="center">
+  <img alt="main" src="temp/main.jpg" width="45%">
+&nbsp; &nbsp; &nbsp; &nbsp;
+  <img alt="Dark" src="temp/cut.jpg" width="50%">
+</p>
