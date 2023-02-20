@@ -14,6 +14,7 @@ from PIL import Image, ImageOps
 from src.screenshot_taker import MyWidget
 from src.html_to_image import make_gradient_image
 from src.image_shaper import ImgModifier
+from src.scroll_action import ScrollableLabelButtonFrame
 
 customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("green")  # Theme
@@ -143,11 +144,19 @@ class App(customtkinter.CTk):
         self.main_image.grid(row=0, column=0, padx=pad_x, pady=pad_y)
 
         # refresh gradient, generate random gradient
+        button_frame = customtkinter.CTkFrame(self.home_frame)
         regen_grad = customtkinter.CTkButton(
-            self.home_frame,
+            button_frame,
             text="Refresh Gradient", command=self.generate_gradient, border_spacing=10)
-        regen_grad.grid(row=2, column=0)
+        regen_grad.grid(row=0, column=0)
+        button_frame.grid(row=2, column=0)
 
+        # save modified image
+        save_button = customtkinter.CTkButton(
+            button_frame, text="Save Image", command=self.save_image, border_spacing=10)
+        save_button.grid(row=0, column=1, padx=20)
+
+        # checkbox for same color
         if self.use_same_colors is None:
             self.use_same_colors = customtkinter.CTkCheckBox(
                 self.home_frame, text="Keep Same Colors"
@@ -172,13 +181,15 @@ class App(customtkinter.CTk):
         slider.set(self.padding)
         slider_label = customtkinter.CTkLabel(sl_frame, text=f"Padding : {padding}x")
         slider_label.grid(row=0, column=0)
-        slider.grid(row=0, column=1)
+        slider.grid(row=0, column=1, padx=10)
+
         sl_frame.grid(row=4, column=0)
 
-        # save modified image
-        save_button = customtkinter.CTkButton(
-            self.home_frame, text="Save Image", command=self.save_image, border_spacing=10)
-        save_button.grid(row=5, column=0)
+        # scrolls gradients
+        scrolls = ScrollableLabelButtonFrame(
+            master=self.home_frame, width=200, command=self.action_taken, corner_radius=10, orientation="horizontal"
+        )
+        scrolls.grid(row=5, column=0, padx=0, pady=10, sticky="nsew")
 
         self.deiconify()
 
@@ -235,6 +246,11 @@ class App(customtkinter.CTk):
         if messagebox.askokcancel("Quit", "Do you want to quit, have you saved the image?"):
             tempdir.cleanup()
             self.destroy()
+
+    @staticmethod
+    def action_taken(image):
+        """Action after click"""
+        print("action")
 
 
 if __name__ == "__main__":
