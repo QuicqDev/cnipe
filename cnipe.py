@@ -187,9 +187,20 @@ class App(customtkinter.CTk):
 
         # scrolls gradients
         scrolls = ScrollableLabelButtonFrame(
-            master=self.home_frame, width=200, command=self.action_taken, corner_radius=10, orientation="horizontal"
+            master=self.home_frame, width=200, height=150,
+            command=self.action_taken, corner_radius=10, orientation="horizontal"
         )
-        scrolls.grid(row=5, column=0, padx=0, pady=10, sticky="nsew")
+        scrolls.grid(row=5, column=0, padx=100, pady=10, sticky="nsew")
+
+        grad_images_dir = r"ui/premade_gradients"
+        gradients = [grad_images_dir + "/" + i for i in os.listdir(grad_images_dir)]
+
+        for i in range(len(gradients)):
+            scrolls.add_item(
+                "x", image=customtkinter.CTkImage(
+                    Image.open(gradients[i]), size=(200, 100)
+                )
+            )
 
         self.deiconify()
 
