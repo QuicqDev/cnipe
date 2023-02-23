@@ -2,8 +2,6 @@
 Scroll action
 """
 import customtkinter
-import os
-from PIL import Image
 
 
 class ScrollableLabelButtonFrame(customtkinter.CTkScrollableFrame):

@@ -51,6 +51,8 @@ class App(customtkinter.CTk):
         self.main_image = None
         self.modified_image = None
         self.padding = 25
+        self.scrolls = None
+        self.selected_grad_image = None
 
         # set grid layout 1x2
         self.grid_rowconfigure(0, weight=1)
@@ -86,7 +88,7 @@ class App(customtkinter.CTk):
 
         self.home_button_event()
 
-    def capture_screenshot(self, use_old=False, padding=25):
+    def capture_screenshot(self, use_old=False, new_gradient=None, padding=25):
         """
         capture screenshot
         """
@@ -104,19 +106,22 @@ class App(customtkinter.CTk):
             qt_app.exec_()
             window.destroy()
 
-        color_grad = None
-        if self.use_same_colors is not None and self.use_same_colors.get() == 1:
-            color_grad = self.colors
+        if new_gradient is None:
+            color_grad = None
+            if self.use_same_colors is not None and self.use_same_colors.get() == 1:
+                color_grad = self.colors
 
-        # create gradient
-        gradient_path, self.colors = make_gradient_image(
-            store_dir=IMAGE_DIR_PATH,
-            gradient_name=gradient_name,
-            colors=color_grad
-        )
+            # create gradient
+            self.selected_grad_image, self.colors = make_gradient_image(
+                store_dir=IMAGE_DIR_PATH,
+                gradient_name=gradient_name,
+                colors=color_grad
+            )
+        else:
+            self.selected_grad_image = new_gradient
 
         image_modify_object = ImgModifier(
-            outer_img=Image.open(os.path.join(gradient_path)),
+            outer_img=Image.open(os.path.join(self.selected_grad_image)),
             inner_img=Image.open(os.path.join(IMAGE_DIR_PATH, capture_name)),
             padding=padding
         )
@@ -186,21 +191,22 @@ class App(customtkinter.CTk):
         sl_frame.grid(row=4, column=0)
 
         # scrolls gradients
-        scrolls = ScrollableLabelButtonFrame(
-            master=self.home_frame, width=200, height=150,
-            command=self.action_taken, corner_radius=10, orientation="horizontal"
-        )
-        scrolls.grid(row=5, column=0, padx=100, pady=10, sticky="nsew")
-
-        grad_images_dir = r"ui/premade_gradients"
-        gradients = [grad_images_dir + "/" + i for i in os.listdir(grad_images_dir)]
-
-        for i in range(len(gradients)):
-            scrolls.add_item(
-                "x", image=customtkinter.CTkImage(
-                    Image.open(gradients[i]), size=(200, 100)
-                )
+        if self.scrolls is None or not use_old:
+            self.scrolls = ScrollableLabelButtonFrame(
+                master=self.home_frame, width=200, height=150,
+                command=self.action_taken, corner_radius=10, orientation="horizontal"
             )
+            self.scrolls.grid(row=5, column=0, padx=100, pady=10, sticky="nsew")
+
+            grad_images_dir = r"ui/premade_gradients"
+            gradients = [grad_images_dir + "/" + i for i in os.listdir(grad_images_dir)]
+
+            for i in range(len(gradients)):
+                self.scrolls.add_item(
+                    gradients[i], image=customtkinter.CTkImage(
+                        Image.open(gradients[i]), size=(200, 100)
+                    )
+                )
 
         self.deiconify()
 
@@ -242,7 +248,7 @@ class App(customtkinter.CTk):
         """
         Slider padding
         """
-        self.capture_screenshot(use_old=True, padding=int(slide))
+        self.capture_screenshot(use_old=True, padding=int(slide), new_gradient=self.selected_grad_image)
 
     def save_image(self):
         """save image to selected file"""
@@ -258,10 +264,11 @@ class App(customtkinter.CTk):
             tempdir.cleanup()
             self.destroy()
 
-    @staticmethod
-    def action_taken(image):
+    def action_taken(self, image):
         """Action after click"""
-        print("action")
+        self.capture_screenshot(
+            use_old=True, new_gradient=image
+        )
 
 
 if __name__ == "__main__":
