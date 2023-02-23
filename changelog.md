@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.1
+
+1. Bug fix: Gradients changed when padding changed, this is fixed
+2. Add gradients scroll to select from
+3. Keep the selected gradient/random background in cache until its changed
+4. Only "Refresh Gradient" will change gradient
+
 ## v0.2.0
 
 1. Bug fix with CTk v5.1.2 : full screen on start

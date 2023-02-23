@@ -34,7 +34,7 @@ def make_gradient_image(store_dir, gradient_name, colors):
     html = f"""<!DOCTYPE html>
     <html>
     <head>
-    <style> 
+    <style>
     #grad1 {{
        height: 1080px; width: 1920px;
       background-image: linear-gradient({grad_strings});
@@ -43,10 +43,28 @@ def make_gradient_image(store_dir, gradient_name, colors):
     </head>
     <body>
     <div id="grad1"></div>
-    
+
     </body>
     </html>
     """
+
+    # html = f"""
+    # <!DOCTYPE html>
+    # <html>
+    # <head>
+    # <style>
+    # #grad1 {{
+    #    height: 1080px; width: 1920px;
+    #   background-image: linear-gradient({grad_strings});
+    # }}
+    # </style>
+    # </head>
+    # <body>
+    # <div id="grad1"></div>
+    #
+    # </body>
+    # </html>
+    # """
 
     hti.screenshot(html_str=html, save_as=gradient_name)
 
