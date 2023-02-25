@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.2
+
+1. UI: fix fg colors, modern look
+2. Add more gradients
+
 ## v0.2.1
 
 1. Bug fix: Gradients changed when padding changed, this is fixed
