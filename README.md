@@ -25,9 +25,4 @@ pyinstaller --noconfirm --onedir --windowed --icon "E:/Others/GNapper/ui/gnapper
 
 
 # Sample Images
-
-<p align="center">
-  <img alt="main" src="temp/main.jpg" width="45%">
-&nbsp; &nbsp; &nbsp; &nbsp;
-  <img alt="Dark" src="temp/cut.jpg" width="50%">
-</p>
+![fc](temp/fscshot.jpg)

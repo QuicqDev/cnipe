@@ -8,7 +8,7 @@ class ScrollableLabelButtonFrame(customtkinter.CTkScrollableFrame):
     """Scroll class"""
 
     def __init__(self, master, command=None, **kwargs):
-        customtkinter.ThemeManager.theme["CTkScrollableFrame"] = {'label_fg_color': ['gray78', 'gray23']}
+        customtkinter.ThemeManager.theme["CTkScrollableFrame"] = {'label_fg_color': ['#242424', "#242424"]}
         super().__init__(master, **kwargs)
         self.grid_rowconfigure(0, weight=0)
 
@@ -16,19 +16,25 @@ class ScrollableLabelButtonFrame(customtkinter.CTkScrollableFrame):
         self.radiobutton_variable = customtkinter.StringVar()
         self.label_list = []
         self.button_list = []
+        self.grad_count = 0
+        self._grad_row = 0
+        self._grad_column = -1
 
     def add_item(self, item, image=None):
         """Add items to scroll"""
-        label = customtkinter.CTkLabel(self, text="", image=image)
-        button = customtkinter.CTkButton(self, text="Select Gradient", width=100, height=24)
+        if image is not None:
+            self.grad_count += 1
+            self._grad_column += 1
+        if self.grad_count > 10:
+            self._grad_row += 1
+            self._grad_column = 0
+            self.grad_count = 0
+
+        button = customtkinter.CTkButton(
+            self, text="", width=40, height=40, image=image, border_spacing=0, border_width=0,
+            fg_color="#242424"
+        )
         if self.command is not None:
             button.configure(command=lambda: self.command(item))
-        label.grid(row=0, column=len(self.label_list), padx=20)
-        button.grid(row=1, column=len(self.button_list), padx=20, pady=10)
-        self.label_list.append(label)
+        button.grid(row=self._grad_row, column=self._grad_column, padx=5, pady=5)
         self.button_list.append(button)
-
-    @staticmethod
-    def action_taken(image):
-        """Action after click"""
-        print("action")
