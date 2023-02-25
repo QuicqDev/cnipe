@@ -3,6 +3,7 @@ Take beautiful screenshots from CNIPE
 @author : Ashutosh | created on : 01-02-2023
 """
 import os
+import random
 import tempfile
 from tkinter import filedialog, messagebox
 
@@ -31,6 +32,7 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
+        self._home_background = "#242424"
         # set full screen for better view, full screen is different in different OS
         if os.name == "nt":
             self.state('zoomed')
@@ -149,62 +151,67 @@ class App(customtkinter.CTk):
         self.main_image.grid(row=0, column=0, padx=pad_x, pady=pad_y)
 
         # refresh gradient, generate random gradient
-        button_frame = customtkinter.CTkFrame(self.home_frame)
+        button_frame = customtkinter.CTkFrame(self.home_frame, fg_color=self._home_background)
         regen_grad = customtkinter.CTkButton(
             button_frame,
-            text="Refresh Gradient", command=self.generate_gradient, border_spacing=10)
-        regen_grad.grid(row=0, column=0)
+            text="Random Gradient", command=self.generate_gradient, border_spacing=10,
+            fg_color=self._home_background, border_color="#e337b1", border_width=2
+        )
+        regen_grad.grid(row=0, column=0, padx=10, pady=10)
         button_frame.grid(row=2, column=0)
 
         # save modified image
         save_button = customtkinter.CTkButton(
-            button_frame, text="Save Image", command=self.save_image, border_spacing=10)
-        save_button.grid(row=0, column=1, padx=20)
+            button_frame, text="Save Image", command=self.save_image, border_spacing=10,
+            fg_color=self._home_background, border_color="#308eea", border_width=2)
+        save_button.grid(row=0, column=1, padx=10)
 
         # checkbox for same color
         if self.use_same_colors is None:
             self.use_same_colors = customtkinter.CTkCheckBox(
-                self.home_frame, text="Keep Same Colors"
+                button_frame, text="Keep Same Colors"
             )
-            self.use_same_colors.grid(row=3, column=0, padx=10, pady=10)
+            self.use_same_colors.grid(row=0, column=2, padx=10, pady=10)
         else:
             current_val = self.use_same_colors.get()
             self.use_same_colors = customtkinter.CTkCheckBox(
-                self.home_frame, text="Keep Same Colors"
+                button_frame, text="Keep Same Colors"
             )
-            self.use_same_colors.grid(row=3, column=0, padx=10, pady=10)
+            self.use_same_colors.grid(row=0, column=3, padx=10, pady=10)
             if current_val == 1:
                 self.use_same_colors.select()
 
         # slider frame
-        sl_frame = customtkinter.CTkFrame(self.home_frame)
+        sl_frame = customtkinter.CTkFrame(button_frame, fg_color=self._home_background)
         slider = customtkinter.CTkSlider(
             sl_frame, from_=5, to=100, command=self.slider_event,
-            number_of_steps=15
+            number_of_steps=15, fg_color="#49cdc5"
         )
         self.padding = padding
         slider.set(self.padding)
         slider_label = customtkinter.CTkLabel(sl_frame, text=f"Padding : {padding}x")
-        slider_label.grid(row=0, column=0)
+        slider_label.grid(row=0, column=0, padx=10)
         slider.grid(row=0, column=1, padx=10)
 
-        sl_frame.grid(row=4, column=0)
+        sl_frame.grid(row=0, column=4)
 
         # scrolls gradients
         if self.scrolls is None or not use_old:
             self.scrolls = ScrollableLabelButtonFrame(
-                master=self.home_frame, width=200, height=150,
-                command=self.action_taken, corner_radius=10, orientation="horizontal"
+                master=self.home_frame, width=200, height=170,
+                command=self.action_taken, corner_radius=10, orientation="horizontal",
+                fg_color=self._home_background
             )
             self.scrolls.grid(row=5, column=0, padx=100, pady=10, sticky="nsew")
 
             grad_images_dir = r"ui/premade_gradients"
             gradients = [grad_images_dir + "/" + i for i in os.listdir(grad_images_dir)]
+            gradients = random.sample(gradients, 20)  # get 20 random gradients
 
             for i in range(len(gradients)):
                 self.scrolls.add_item(
                     gradients[i], image=customtkinter.CTkImage(
-                        Image.open(gradients[i]), size=(200, 100)
+                        Image.open(gradients[i]), size=(100, 70)
                     )
                 )
 
