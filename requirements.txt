@@ -1,4 +1,4 @@
-html2image==2.0.1
+html2image==2.0.3
 Pillow==9.4.0
 PyQt5==5.15.8
 PyQt6==6.4.1
